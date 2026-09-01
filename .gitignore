@@ -43,13 +43,8 @@ scratch_temp_*
 # Large Datasets & Archives
 dataset/
 archive/
-sample/
 *.tar
 *.tar.filepart
-
-# Output directories & test generated files
-output/
-sample_output/
 
 # OS generated files
 .DS_Store

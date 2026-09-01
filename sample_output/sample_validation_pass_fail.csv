@@ -1,0 +1,14 @@
+filename,ela_variance,cnn_genuine_prob,passes_ela,passes_cnn,final_verdict,validation_status
+download (1).jpg,0.22,0.949,True,True,PASSED (GENUINE),PASS
+download (12).jpg,1.0,0.576,True,False,FAILED (FAKE),FAIL
+download (2).jpg,0.23,0.1637,True,False,FAILED (FAKE),FAIL
+download (3).jpg,0.31,0.0745,True,False,FAILED (FAKE),FAIL
+download (4).jpg,0.21,0.6755,True,False,FAILED (FAKE),FAIL
+download (5).jpg,0.19,0.0473,True,False,FAILED (FAKE),FAIL
+download (6).jpg,0.33,0.9435,True,True,PASSED (GENUINE),PASS
+download.jpg,0.27,0.1777,True,False,FAILED (FAKE),FAIL
+Screenshot 2026-09-01 132522.png,0.66,0.5398,True,False,FAILED (FAKE),FAIL
+Screenshot 2026-09-01 132537.png,1.26,0.0296,True,False,FAILED (FAKE),FAIL
+Screenshot 2026-09-01 132551.png,0.58,0.5203,True,False,FAILED (FAKE),FAIL
+WhatsApp Image 2026-08-31 at 9.59.21 PM.jpeg,0.46,0.7823,True,False,FAILED (FAKE),FAIL
+￼_￼__.jpg,0.29,0.1748,True,False,FAILED (FAKE),FAIL

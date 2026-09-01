@@ -1,0 +1,14 @@
+filename,ela_variance,cnn_score,classification,reason
+Screenshot 2026-09-01 132522.png,0.66,0.5398,GENUINE,Valid structural layout & clean compression
+Screenshot 2026-09-01 132537.png,1.26,0.0296,FAKE,Failed CNN layout match (Non-standard font / template mockup)
+Screenshot 2026-09-01 132551.png,0.58,0.5203,GENUINE,Valid structural layout & clean compression
+WhatsApp Image 2026-08-31 at 9.59.21 PM.jpeg,0.46,0.7823,GENUINE,Valid structural layout & clean compression
+download (1).jpg,0.22,0.949,GENUINE,Valid structural layout & clean compression
+download (12).jpg,1.0,0.576,GENUINE,Valid structural layout & clean compression
+download (2).jpg,0.23,0.1637,FAKE,Failed CNN layout match (Non-standard font / template mockup)
+download (3).jpg,0.31,0.0745,FAKE,Failed CNN layout match (Non-standard font / template mockup)
+download (4).jpg,0.21,0.6755,GENUINE,Valid structural layout & clean compression
+download (5).jpg,0.19,0.0473,FAKE,Failed CNN layout match (Non-standard font / template mockup)
+download (6).jpg,0.33,0.9435,GENUINE,Valid structural layout & clean compression
+download.jpg,0.27,0.1777,FAKE,Failed CNN layout match (Non-standard font / template mockup)
+￼_￼__.jpg,0.29,0.1748,FAKE,Failed CNN layout match (Non-standard font / template mockup)

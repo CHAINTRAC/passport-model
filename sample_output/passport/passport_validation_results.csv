@@ -1,0 +1,14 @@
+filename,ela_variance,cnn_genuine_prob,passes_ela,passes_cnn,predicted_label,verdict,output_path
+Screenshot 2026-09-01 132522.png,0.66,0.5398,True,True,genuine,GENUINE PASSPORT,sample_output/passport\genuine\Screenshot 2026-09-01 132522.png
+Screenshot 2026-09-01 132537.png,1.26,0.0296,True,False,fake,FAKE (Low CNN Genuine Confidence),sample_output/passport\fake\Screenshot 2026-09-01 132537.png
+Screenshot 2026-09-01 132551.png,0.58,0.5203,True,True,genuine,GENUINE PASSPORT,sample_output/passport\genuine\Screenshot 2026-09-01 132551.png
+WhatsApp Image 2026-08-31 at 9.59.21 PM.jpeg,0.46,0.7823,True,True,genuine,GENUINE PASSPORT,sample_output/passport\genuine\WhatsApp Image 2026-08-31 at 9.59.21 PM.jpeg
+download (1).jpg,0.22,0.949,True,True,genuine,GENUINE PASSPORT,sample_output/passport\genuine\download (1).jpg
+download (12).jpg,1.0,0.576,True,True,genuine,GENUINE PASSPORT,sample_output/passport\genuine\download (12).jpg
+download (2).jpg,0.23,0.1637,True,False,fake,FAKE (Low CNN Genuine Confidence),sample_output/passport\fake\download (2).jpg
+download (3).jpg,0.31,0.0745,True,False,fake,FAKE (Low CNN Genuine Confidence),sample_output/passport\fake\download (3).jpg
+download (4).jpg,0.21,0.6755,True,True,genuine,GENUINE PASSPORT,sample_output/passport\genuine\download (4).jpg
+download (5).jpg,0.19,0.0473,True,False,fake,FAKE (Low CNN Genuine Confidence),sample_output/passport\fake\download (5).jpg
+download (6).jpg,0.33,0.9435,True,True,genuine,GENUINE PASSPORT,sample_output/passport\genuine\download (6).jpg
+download.jpg,0.27,0.1777,True,False,fake,FAKE (Low CNN Genuine Confidence),sample_output/passport\fake\download.jpg
+￼_￼__.jpg,0.29,0.1748,True,False,fake,FAKE (Low CNN Genuine Confidence),sample_output/passport\fake\￼_￼__.jpg

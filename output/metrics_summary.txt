@@ -1,0 +1,14 @@
+MIDV-2020 SIDTD MODEL EVALUATION SUMMARY
+=========================================
+Total Evaluated Images: 5000
+Accuracy: 0.4982
+Precision: 1.0000
+Recall: 0.4982
+F1-Score: 0.6651
+Specificity: 0.0000
+FPR: 0.0000
+FNR: 0.5018
+
+Confusion Matrix [TN, FP / FN, TP]:
+[[   0    0]
+ [2509 2491]]

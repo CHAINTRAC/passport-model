@@ -1,0 +1,14 @@
+filename,doc_type,cnn_score,risk_score,verdict,primary_reason,all_reasons
+Screenshot 2026-09-01 132522.png,passport,0.5398,0.0,GENUINE,Valid layout & verifiable security features,
+Screenshot 2026-09-01 132537.png,passport,0.0296,0.35,SUSPICIOUS,Low CNN visual similarity score (0.0296),Low CNN visual similarity score (0.0296)
+Screenshot 2026-09-01 132551.png,passport,0.5203,0.0,GENUINE,Valid layout & verifiable security features,
+WhatsApp Image 2026-08-31 at 9.59.21 PM.jpeg,passport,0.7823,0.0,GENUINE,Valid layout & verifiable security features,
+download (1).jpg,passport,0.949,0.0,GENUINE,Valid layout & verifiable security features,
+download (12).jpg,passport,0.576,0.0,GENUINE,Valid layout & verifiable security features,
+download (2).jpg,passport,0.1637,0.35,SUSPICIOUS,Low CNN visual similarity score (0.1637),Low CNN visual similarity score (0.1637)
+download (3).jpg,passport,0.0745,0.35,SUSPICIOUS,Low CNN visual similarity score (0.0745),Low CNN visual similarity score (0.0745)
+download (4).jpg,passport,0.6755,0.0,GENUINE,Valid layout & verifiable security features,
+download (5).jpg,passport,0.0473,0.35,SUSPICIOUS,Low CNN visual similarity score (0.0473),Low CNN visual similarity score (0.0473)
+download (6).jpg,passport,0.9435,0.0,GENUINE,Valid layout & verifiable security features,
+download.jpg,passport,0.1777,0.35,SUSPICIOUS,Low CNN visual similarity score (0.1777),Low CNN visual similarity score (0.1777)
+￼_￼__.jpg,passport,0.0,0.0,INSUFFICIENT_IMAGE_QUALITY,Unreadable image file,Unreadable image file

@@ -1,0 +1,9 @@
+filename,genuine_probability,predicted_label
+Screenshot 2026-08-31 214129.png,0.8923119306564331,genuine
+Screenshot 2026-08-31 215840.png,0.7338283061981201,genuine
+Screenshot 2026-09-01 132522.png,0.5398343801498413,genuine
+Screenshot 2026-09-01 132537.png,0.02963489107787609,fake
+Screenshot 2026-09-01 132551.png,0.5202566385269165,genuine
+Screenshot 2026-09-01 132604.png,0.6860584020614624,genuine
+Screenshot 2026-09-01 132619.png,0.8880712985992432,genuine
+WhatsApp Image 2026-08-31 at 9.59.21 PM.jpeg,0.782255232334137,genuine
