@@ -142,3 +142,87 @@ print("Risk Score :", report['risk_score'])
 print("Reasons    :", report['reasons'])
 print("Evidence   :", report['evidence_table'])
 ```
+
+---
+
+## ⚡ FastAPI Production Web Server
+
+The repository includes a ready-to-run FastAPI REST API server (`server.py`) with header-based API key security (`X-API-Key`), multi-part image uploads, upload file validation, and automatic lifespan model initialization.
+
+### 1. Running the API Server
+
+```bash
+# Start server with Uvicorn (loads model once on startup)
+python server.py
+
+# Or directly with Uvicorn CLI:
+uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Interactive OpenAPI Swagger UI is available at: **`http://localhost:8000/docs`**
+
+### 2. Environment Variables Configuration
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `API_KEY` | Secret key required in `X-API-Key` header | `midv2020-secret-api-key-2026` |
+| `MAX_UPLOAD_SIZE_MB` | Maximum allowed file upload size in MB | `10.0` |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | `""` (CORS disabled if empty) |
+
+### 3. API Endpoints
+
+- **`GET /`**: API Metadata and routing URLs.
+- **`GET /health`**: Vitality health check (`{"status": "healthy"}`).
+- **`GET /ready`**: Readiness health check verifying model is loaded.
+- **`POST /api/v1/verify`**: Document Verification endpoint (`multipart/form-data`).
+
+### 4. Integration Examples
+
+#### cURL Command
+```bash
+curl -X POST "http://localhost:8000/api/v1/verify" \
+  -H "X-API-Key: midv2020-secret-api-key-2026" \
+  -F "image=@sample/passport/sample_passport.jpg" \
+  -F "doc_type=passport" \
+  -F "doc_number=Z1234567" \
+  -F "mrz_line1=P<INDTEST<<SAMPLE<<<<<<<<<<<<<<<<<<<<<<<<<<<" \
+  -F "mrz_line2=Z1234567<4IND9001011M3001017<<<<<<<<<<<<<<04"
+```
+
+#### Python (`requests`) Backend Integration
+```python
+import requests
+
+API_URL = "http://localhost:8000/api/v1/verify"
+API_KEY = "midv2020-secret-api-key-2026"
+
+headers = {"X-API-Key": API_KEY}
+data = {
+    "doc_type": "passport",
+    "doc_number": "Z1234567"
+}
+
+with open("path/to/passport_image.jpg", "rb") as img_file:
+    files = {"image": ("passport.jpg", img_file, "image/jpeg")}
+    response = requests.post(API_URL, headers=headers, data=data, files=files)
+
+res_json = response.json()
+print("Success:", res_json["success"])
+print("Verdict:", res_json["verdict"])
+print("Risk Score:", res_json["risk_score"])
+print("Evidence Table:", res_json["evidence_table"])
+```
+
+### 5. HTTP Error Codes Contract
+
+| Status Code | Error Code | Cause |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `MISSING_API_KEY` | `X-API-Key` header missing |
+| `403 Forbidden` | `INVALID_API_KEY` | Invalid API Key provided |
+| `400 Bad Request` | `INVALID_DOC_TYPE` | `doc_type` not in `[auto, passport, aadhaar]` |
+| `400 Bad Request` | `INVALID_IMAGE` | Corrupt or undecodable image file |
+| `413 Payload Too Large` | `FILE_TOO_LARGE` | File exceeds `MAX_UPLOAD_SIZE_MB` |
+| `415 Unsupported Media` | `UNSUPPORTED_FILE_TYPE` | Non-image file format uploaded |
+| `503 Service Unavailable` | `MODEL_UNAVAILABLE` | Pipeline or TensorFlow model not loaded |
+| `500 Internal Error` | `PIPELINE_ERROR` | Internal server prediction exception |
+```
