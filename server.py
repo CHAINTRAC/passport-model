@@ -17,6 +17,9 @@ from pydantic import BaseModel, Field
 
 from predict_pipeline import DocumentAuthenticityPipeline
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Configure Logging (DO NOT log API keys, document numbers, MRZ data, or file contents)
 logging.basicConfig(
     level=logging.INFO,
@@ -326,4 +329,5 @@ def verify_document(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True)

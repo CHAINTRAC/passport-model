@@ -10,9 +10,14 @@ Usage:
 import sys
 import os
 import requests
+from dotenv import load_dotenv
 
-SERVER_URL = "http://localhost:8000"
+load_dotenv()
+
+PORT = os.getenv("PORT", "8000")
+SERVER_URL = os.getenv("SERVER_URL", f"http://localhost:{PORT}")
 API_KEY = os.getenv("API_KEY", "midv2020-secret-api-key-2026")
+
 
 
 def test_server():
