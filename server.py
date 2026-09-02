@@ -17,8 +17,12 @@ from pydantic import BaseModel, Field
 
 from predict_pipeline import DocumentAuthenticityPipeline
 
-from dotenv import load_dotenv
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 
 # Configure Logging (DO NOT log API keys, document numbers, MRZ data, or file contents)
 logging.basicConfig(

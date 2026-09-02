@@ -10,9 +10,12 @@ Usage:
 import sys
 import os
 import requests
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
-load_dotenv()
 
 PORT = os.getenv("PORT", "8000")
 SERVER_URL = os.getenv("SERVER_URL", f"http://localhost:{PORT}")
