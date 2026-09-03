@@ -1,0 +1,9 @@
+filename,verdict,risk_score,resolution,aspect_ratio,is_id1_geometry,blur_score,ela_variance,sensor_noise_variance,reasons,classified_folder,output_path
+1.jpg,SUSPICIOUS,0.4,735x461,1.59,True,664.81,400.83,55.92,Elevated ELA compression variance (400.83 > 350.0 - double JPEG compression / digital edit anomaly),suspicious,suspicious\1.jpg
+2.jpg,SUSPICIOUS,0.45,736x981,0.75,False,354.89,166.65,41.0,Moderate ELA compression variance (166.65); Non-standard ID-1 card aspect ratio (0.75 - expected 1.35-1.75),suspicious,suspicious\2.jpg
+3.jpg,GENUINE,0.2,735x454,1.62,True,1029.12,194.34,98.64,"Moderate ELA compression variance (194.34); Genuine camera capture. Standard geometry, clean resolution, and low ELA compression variance.",genuine,genuine\3.jpg
+4.jpg,SUSPICIOUS,0.4,735x450,1.63,True,637.86,561.47,66.19,Elevated ELA compression variance (561.47 > 350.0 - double JPEG compression / digital edit anomaly),suspicious,suspicious\4.jpg
+5.jpg,SUSPICIOUS,0.4,695x419,1.66,True,5863.28,376.08,418.65,Elevated ELA compression variance (376.08 > 350.0 - double JPEG compression / digital edit anomaly),suspicious,suspicious\5.jpg
+vasu.jpg,GENUINE,0.25,1280x720,1.78,False,429.05,19.31,44.1,"Non-standard ID-1 card aspect ratio (1.78 - expected 1.35-1.75); Genuine camera capture. Standard geometry, clean resolution, and low ELA compression variance.",genuine,genuine\vasu.jpg
+vighnesh.jpeg,GENUINE,0.0,1017x717,1.42,True,301.69,47.67,35.12,"Genuine camera capture. Standard geometry, clean resolution, and low ELA compression variance.",genuine,genuine\vighnesh.jpeg
+wrong.jpg,INSUFFICIENT_IMAGE_QUALITY,1.0,N/A,N/A,False,0.0,0.0,0.0,Severe blur detected (Blur Score: 12.24 < 25.0 threshold),insufficient_quality,insufficient_quality\wrong.jpg
