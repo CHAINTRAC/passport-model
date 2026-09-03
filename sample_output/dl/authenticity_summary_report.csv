@@ -1,0 +1,7 @@
+filename,doc_type,cnn_score,risk_score,verdict,primary_reason,all_reasons
+1.jpg,dl,0.5731,0.2,GENUINE,Elevated ELA compression variance (400.8 > 350.0 - possible digital editing),Elevated ELA compression variance (400.8 > 350.0 - possible digital editing)
+2.jpg,dl,0.3167,0.35,SUSPICIOUS,Moderate CNN visual similarity score (0.3167),Moderate CNN visual similarity score (0.3167) | Non-standard card aspect ratio (0.75)
+3.jpg,dl,0.774,0.0,GENUINE,Valid layout & verifiable security features,
+4.jpg,dl,0.9543,0.2,GENUINE,Elevated ELA compression variance (561.5 > 350.0 - possible digital editing),Elevated ELA compression variance (561.5 > 350.0 - possible digital editing)
+5.jpg,dl,0.3363,0.35,SUSPICIOUS,Moderate CNN visual similarity score (0.3363),Moderate CNN visual similarity score (0.3363) | Elevated ELA compression variance (376.1 > 350.0 - possible digital editing)
+wrong.jpg,dl,0.0,0.0,INSUFFICIENT_IMAGE_QUALITY,Severe image blur detected (Blur Score: 12.2 < 25.0),Severe image blur detected (Blur Score: 12.2 < 25.0)

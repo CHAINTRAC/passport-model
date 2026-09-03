@@ -15,6 +15,8 @@ import tensorflow as tf
 
 from indian_passport_verifier import IndianPassportVerifier
 from aadhaar_verifier import AadhaarVerifier
+from indian_dl_verifier import IndianDLVerifier
+from dl_forensic_analyzer import DLForensicAnalyzer
 
 
 class DocumentAuthenticityPipeline:
@@ -36,6 +38,8 @@ class DocumentAuthenticityPipeline:
         self.model = None
         self.passport_verifier = IndianPassportVerifier()
         self.aadhaar_verifier = AadhaarVerifier()
+        self.dl_verifier = IndianDLVerifier()
+        self.dl_forensic_analyzer = DLForensicAnalyzer()
         self._load_cnn_model()
 
     def _load_cnn_model(self):
@@ -176,6 +180,8 @@ class DocumentAuthenticityPipeline:
                 doc_type = "passport"
             elif "aadhar" in img_path.lower() or "aadhaar" in img_path.lower():
                 doc_type = "aadhar"
+            elif "dl" in img_path.lower() or "licence" in img_path.lower() or "license" in img_path.lower():
+                doc_type = "dl"
             else:
                 doc_type = "passport"  # Default fallback
         report['doc_type'] = doc_type.lower()
@@ -185,7 +191,13 @@ class DocumentAuthenticityPipeline:
         report['evidence_table']['cnn_score'] = cnn_score
 
         # Step 4: Forensic ELA Anomaly Score
-        ela_res = self.passport_verifier.compute_ela_score(img_path) if doc_type == "passport" else self.aadhaar_verifier.compute_ela_tampering_score(img_path)
+        if doc_type == "passport":
+            ela_res = self.passport_verifier.compute_ela_score(img_path)
+        elif doc_type == "aadhar":
+            ela_res = self.aadhaar_verifier.compute_ela_tampering_score(img_path)
+        else:
+            ela_res = {"ela_variance_score": self.dl_forensic_analyzer.analyze_ela_tampering(img_path)}
+            
         report['evidence_table']['ela_forensics'] = ela_res
 
         # Risk Score Initialization
@@ -261,6 +273,25 @@ class DocumentAuthenticityPipeline:
             if qr_res['status'] == 'QR_UNVERIFIED_OR_DEGRADED':
                 risk_score += 0.10  # Minor supporting flag, NOT automatic fake
                 reasons.append("QR code missing or unverified (supporting evidence)")
+
+        elif doc_type in ("dl", "driving_licence", "driving_license"):
+            # Driving Licence Forensics & Card Geometry Check
+            dl_report = self.dl_forensic_analyzer.analyze_document(img_path)
+            report['evidence_table']['dl_forensics'] = dl_report
+            
+            is_id1 = dl_report.get('evidence', {}).get('is_id1_geometry', True)
+            if not is_id1:
+                risk_score += 0.20
+                reasons.append(f"Non-standard card aspect ratio ({dl_report.get('evidence', {}).get('aspect_ratio')})")
+
+            # Driving Licence Number Format & Parivahan Check
+            if doc_number:
+                dl_res = self.dl_verifier.verify(doc_number, perform_api_check=True)
+                report['evidence_table']['dl_number_verification'] = dl_res
+                if not dl_res['overall_valid']:
+                    risk_score += 0.35
+                    fmt_msg = dl_res.get('format_validation', {}).get('message', 'Invalid DL number format')
+                    reasons.append(f"Driving Licence validation failed: {fmt_msg}")
 
         # Step 6: Verdict Determination based on Aggregated Risk
         report['risk_score'] = round(min(risk_score, 1.0), 2)
@@ -356,8 +387,8 @@ def main():
     parser = argparse.ArgumentParser(description="Document Authenticity & Fraud Prediction Pipeline")
     parser.add_argument("--image", type=str, help="Path to single image for evaluation")
     parser.add_argument("--dir", type=str, help="Path to directory containing images for batch evaluation")
-    parser.add_argument("--doc-type", type=str, default="auto", choices=["auto", "passport", "aadhar"], help="Document type (passport, aadhar, auto)")
-    parser.add_argument("--doc-num", type=str, help="Document Number (Passport Number or Aadhaar Number)")
+    parser.add_argument("--doc-type", type=str, default="auto", choices=["auto", "passport", "aadhar", "aadhaar", "dl", "driving_licence"], help="Document type (passport, aadhar, dl, auto)")
+    parser.add_argument("--doc-num", type=str, help="Document Number (Passport Number, Aadhaar Number, or Driving Licence Number)")
     parser.add_argument("--mrz1", type=str, help="Passport MRZ Line 1")
     parser.add_argument("--mrz2", type=str, help="Passport MRZ Line 2")
     parser.add_argument("--output", type=str, default="sample_output", help="Output directory for reports")
@@ -389,11 +420,13 @@ def main():
     elif args.dir:
         pipeline.process_directory(args.dir, doc_type=args.doc_type, output_dir=args.output)
     else:
-        # Default test on sample folders if available
+        # Default batch execution on sample folders if available
         if os.path.exists("sample/passport"):
             pipeline.process_directory("sample/passport", doc_type="passport", output_dir="sample_output/passport_results")
         if os.path.exists("sample/aadhar"):
             pipeline.process_directory("sample/aadhar", doc_type="aadhar", output_dir="sample_output/aadhar_results")
+        if os.path.exists("sample/DL"):
+            pipeline.process_directory("sample/DL", doc_type="dl", output_dir="sample_output/dl")
 
 
 if __name__ == "__main__":

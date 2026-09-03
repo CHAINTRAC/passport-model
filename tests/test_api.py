@@ -178,5 +178,28 @@ def test_verify_auto_doc_type(client):
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True
+
+
+def test_verify_dl_document(client):
+    img_bytes = create_dummy_image_bytes("JPEG", 400, 250)
+    response = client.post(
+        "/api/v1/verify",
+        headers={"X-API-Key": DEFAULT_API_KEY},
+        files={"image": ("dl_sample.jpg", img_bytes, "image/jpeg")},
+        data={
+            "doc_type": "dl",
+            "doc_number": "DL0420110012345"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["filename"] == "dl_sample.jpg"
+    assert data["doc_type"] == "dl"
+    assert "verdict" in data
+    assert "risk_score" in data
+    assert "evidence_table" in data
+    assert "dl_forensics" in data["evidence_table"]
+    assert "dl_number_verification" in data["evidence_table"]
     assert data["filename"] == "auto_sample.jpg"
     assert "verdict" in data

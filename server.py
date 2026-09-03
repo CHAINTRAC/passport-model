@@ -46,7 +46,7 @@ ALLOWED_MIME_TYPES = {
 }
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-ALLOWED_DOC_TYPES = {"auto", "passport", "aadhaar"}
+ALLOWED_DOC_TYPES = {"auto", "passport", "aadhaar", "dl", "driving_licence", "driving_license"}
 
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
@@ -230,6 +230,7 @@ def verify_document(
     image: UploadFile = File(...),
     doc_type: str = Form("auto"),
     doc_number: Optional[str] = Form(None),
+    dob: Optional[str] = Form(None),
     mrz_line1: Optional[str] = Form(None),
     mrz_line2: Optional[str] = Form(None),
     api_key: Optional[str] = Security(api_key_header)
@@ -256,11 +257,16 @@ def verify_document(
     if norm_doc_type not in ALLOWED_DOC_TYPES:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"success": False, "error": {"code": "INVALID_DOC_TYPE", "message": f"Unsupported document type '{doc_type}'. Allowed types: auto, passport, aadhaar"}}
+            content={"success": False, "error": {"code": "INVALID_DOC_TYPE", "message": f"Unsupported document type '{doc_type}'. Allowed types: auto, passport, aadhaar, dl"}}
         )
 
-    # Internal pipeline maps "aadhaar" -> "aadhar"
-    internal_doc_type = "aadhar" if norm_doc_type == "aadhaar" else norm_doc_type
+    # Internal pipeline mapping
+    if norm_doc_type in ("aadhaar", "aadhar"):
+        internal_doc_type = "aadhar"
+    elif norm_doc_type in ("dl", "driving_licence", "driving_license"):
+        internal_doc_type = "dl"
+    else:
+        internal_doc_type = norm_doc_type
 
     # 4. Upload Content Validation
     try:

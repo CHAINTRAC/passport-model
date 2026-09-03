@@ -1,0 +1,15 @@
+filename,doc_type,cnn_score,risk_score,verdict,primary_reason,all_reasons
+7.jpg,aadhar,0.0,0.0,INSUFFICIENT_IMAGE_QUALITY,High surface glare / overexposure detected (69.6% hotspot pixels),High surface glare / overexposure detected (69.6% hotspot pixels)
+Screenshot 2026-09-01 144524.png,aadhar,0.5017,0.25,SUSPICIOUS,Non-standard card aspect ratio (1.471 - expected ID-1 1.50-1.70),Non-standard card aspect ratio (1.471 - expected ID-1 1.50-1.70)
+download (1).jpg,aadhar,0.2799,0.6,FAKE,Low CNN visual similarity score (0.2799),Low CNN visual similarity score (0.2799) | Non-standard card aspect ratio (0.63 - expected ID-1 1.50-1.70)
+download (10).jpg,aadhar,0.2028,0.35,SUSPICIOUS,Low CNN visual similarity score (0.2028),Low CNN visual similarity score (0.2028)
+download (11).jpg,aadhar,0.0,0.0,INSUFFICIENT_IMAGE_QUALITY,High surface glare / overexposure detected (74.8% hotspot pixels),High surface glare / overexposure detected (74.8% hotspot pixels)
+download (2).jpg,aadhar,0.6981,0.25,SUSPICIOUS,Non-standard card aspect ratio (1.31 - expected ID-1 1.50-1.70),Non-standard card aspect ratio (1.31 - expected ID-1 1.50-1.70)
+download (3).jpg,aadhar,0.2348,0.6,FAKE,Low CNN visual similarity score (0.2348),Low CNN visual similarity score (0.2348) | Non-standard card aspect ratio (1.347 - expected ID-1 1.50-1.70)
+download (4).jpg,aadhar,0.4099,0.4,SUSPICIOUS,Moderate CNN visual similarity score (0.4099),Moderate CNN visual similarity score (0.4099) | Non-standard card aspect ratio (0.667 - expected ID-1 1.50-1.70)
+download (5).jpg,aadhar,0.175,0.6,FAKE,Low CNN visual similarity score (0.1750),Low CNN visual similarity score (0.1750) | Non-standard card aspect ratio (0.756 - expected ID-1 1.50-1.70)
+download (6).jpg,aadhar,0.6446,0.25,SUSPICIOUS,Non-standard card aspect ratio (0.563 - expected ID-1 1.50-1.70),Non-standard card aspect ratio (0.563 - expected ID-1 1.50-1.70)
+download (7).jpg,aadhar,0.0,0.0,INSUFFICIENT_IMAGE_QUALITY,High surface glare / overexposure detected (72.1% hotspot pixels),High surface glare / overexposure detected (72.1% hotspot pixels)
+download (8).jpg,aadhar,0.8042,0.0,GENUINE,Valid layout & verifiable security features,
+download (9).jpg,aadhar,0.0,0.0,INSUFFICIENT_IMAGE_QUALITY,High surface glare / overexposure detected (69.7% hotspot pixels),High surface glare / overexposure detected (69.7% hotspot pixels)
+download.jpg,aadhar,0.3119,0.4,SUSPICIOUS,Moderate CNN visual similarity score (0.3119),Moderate CNN visual similarity score (0.3119) | Non-standard card aspect ratio (0.563 - expected ID-1 1.50-1.70)
