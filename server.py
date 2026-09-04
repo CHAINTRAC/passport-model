@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from predict_pipeline import DocumentAuthenticityPipeline
+from schemas.response import VerificationResponse, ErrorResponse, HealthResponse, ReadyResponse, RootResponse
 
 try:
     from dotenv import load_dotenv
@@ -24,7 +25,7 @@ except ImportError:
     pass
 
 
-# Configure Logging (DO NOT log API keys, document numbers, MRZ data, or file contents)
+# Configure Logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
@@ -46,62 +47,24 @@ ALLOWED_MIME_TYPES = {
 }
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-ALLOWED_DOC_TYPES = {"auto", "passport", "aadhaar", "dl", "driving_licence", "driving_license"}
+ALLOWED_DOC_TYPES = {"auto", "passport", "aadhaar", "aadhar", "dl", "driving_licence", "driving_license"}
 
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
-
-
-# --- Pydantic Schema Contracts ---
-
-class ErrorDetail(BaseModel):
-    code: str = Field(..., json_schema_extra={"example": "INVALID_IMAGE"})
-    message: str = Field(..., json_schema_extra={"example": "Uploaded file could not be decoded as an image."})
-
-
-class ErrorResponse(BaseModel):
-    success: bool = Field(False, json_schema_extra={"example": False})
-    error: ErrorDetail
-
-
-class VerificationResponse(BaseModel):
-    success: bool = Field(True, json_schema_extra={"example": True})
-    filename: str = Field(..., json_schema_extra={"example": "passport_sample.jpg"})
-    doc_type: str = Field(..., json_schema_extra={"example": "passport"})
-    verdict: str = Field(..., json_schema_extra={"example": "GENUINE"})
-    risk_score: float = Field(..., json_schema_extra={"example": 0.15})
-    reasons: List[str] = Field(default_factory=list)
-    evidence_table: Dict[str, Any] = Field(default_factory=dict)
-
-
-class HealthResponse(BaseModel):
-    status: str = Field("healthy", json_schema_extra={"example": "healthy"})
-
-
-class ReadyResponse(BaseModel):
-    status: str = Field("ready", json_schema_extra={"example": "ready"})
-    model_loaded: bool = Field(True, json_schema_extra={"example": True})
-    pipeline_ready: bool = Field(True, json_schema_extra={"example": True})
-
-
-class RootResponse(BaseModel):
-    service: str = Field("Document Authenticity API", json_schema_extra={"example": "Document Authenticity API"})
-    version: str = Field("1.0.0", json_schema_extra={"example": "1.0.0"})
-    docs: str = Field("/docs", json_schema_extra={"example": "/docs"})
-    health: str = Field("/health", json_schema_extra={"example": "/health"})
-    ready: str = Field("/ready", json_schema_extra={"example": "/ready"})
-    verify: str = Field("/api/v1/verify", json_schema_extra={"example": "/api/v1/verify"})
 
 
 # --- Lifespan Handler ---
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Initializing DocumentAuthenticityPipeline on startup...")
+    logger.info("Initializing DocumentAuthenticityPipeline & warming up EasyOCR on startup...")
     try:
         pipeline = DocumentAuthenticityPipeline()
+        from document_detection.ocr_features import get_easyocr_reader
+        reader = get_easyocr_reader()
+        
         app.state.pipeline = pipeline
         app.state.pipeline_ready = True
-        logger.info("DocumentAuthenticityPipeline initialized successfully.")
+        logger.info(f"DocumentAuthenticityPipeline initialized successfully (EasyOCR ready: {reader is not None}).")
     except Exception as e:
         logger.error(f"Failed to initialize DocumentAuthenticityPipeline: {str(e)}")
         app.state.pipeline = None
@@ -113,8 +76,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Document Authenticity & Fraud Detection API",
-    description="Production REST API for verifying document authenticity (Indian Passport & Aadhaar Card).",
-    version="1.0.0",
+    description="Production REST API for verifying document authenticity (Indian Passport, Aadhaar Card, Driving Licence).",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -150,14 +113,12 @@ def verify_api_key(api_key: Optional[str]) -> Optional[JSONResponse]:
 
 def validate_image_content(content: bytes, filename: str, content_type: Optional[str]) -> Optional[JSONResponse]:
     """Validates file size, MIME type, and image decodability."""
-    # 1. File size check
     if len(content) > MAX_UPLOAD_SIZE_BYTES:
         return JSONResponse(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             content={"success": False, "error": {"code": "FILE_TOO_LARGE", "message": f"File size exceeds maximum limit of {MAX_UPLOAD_SIZE_MB} MB"}}
         )
 
-    # 2. Extension & MIME check
     ext = os.path.splitext(filename)[1].lower() if filename else ""
     is_valid_mime = content_type and content_type.lower() in ALLOWED_MIME_TYPES
     is_valid_ext = ext in ALLOWED_EXTENSIONS
@@ -168,7 +129,6 @@ def validate_image_content(content: bytes, filename: str, content_type: Optional
             content={"success": False, "error": {"code": "UNSUPPORTED_FILE_TYPE", "message": f"Unsupported file type. Allowed formats: JPEG, PNG, WEBP"}}
         )
 
-    # 3. Actual Image Decodability
     try:
         nparr = np.frombuffer(content, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -187,19 +147,16 @@ def validate_image_content(content: bytes, filename: str, content_type: Optional
 
 @app.get("/", response_model=RootResponse)
 def root():
-    """Returns API metadata and endpoint links."""
     return RootResponse()
 
 
 @app.get("/health", response_model=HealthResponse)
 def health():
-    """Returns service vitality status."""
     return HealthResponse(status="healthy")
 
 
 @app.get("/ready", response_model=ReadyResponse)
 def ready(request: Request):
-    """Returns pipeline readiness status."""
     pipeline_ready = getattr(request.app.state, "pipeline_ready", False)
     pipeline = getattr(request.app.state, "pipeline", None)
     model_loaded = pipeline is not None and getattr(pipeline, "model", None) is not None
@@ -237,14 +194,13 @@ def verify_document(
 ):
     """
     Main Verification Endpoint.
-    Accepts multipart/form-data with image file and optional document verification parameters.
+    Accepts image upload and optional verification parameters.
+    Returns production document authenticity and fraud assessment JSON response.
     """
-    # 1. API Key Authentication
     auth_error = verify_api_key(api_key)
     if auth_error:
         return auth_error
 
-    # 2. Pipeline Availability Check
     pipeline: DocumentAuthenticityPipeline = getattr(request.app.state, "pipeline", None)
     if not pipeline:
         return JSONResponse(
@@ -252,7 +208,6 @@ def verify_document(
             content={"success": False, "error": {"code": "MODEL_UNAVAILABLE", "message": "Document verification pipeline is not initialized"}}
         )
 
-    # 3. Document Type Validation
     norm_doc_type = doc_type.lower().strip() if doc_type else "auto"
     if norm_doc_type not in ALLOWED_DOC_TYPES:
         return JSONResponse(
@@ -260,15 +215,6 @@ def verify_document(
             content={"success": False, "error": {"code": "INVALID_DOC_TYPE", "message": f"Unsupported document type '{doc_type}'. Allowed types: auto, passport, aadhaar, dl"}}
         )
 
-    # Internal pipeline mapping
-    if norm_doc_type in ("aadhaar", "aadhar"):
-        internal_doc_type = "aadhar"
-    elif norm_doc_type in ("dl", "driving_licence", "driving_license"):
-        internal_doc_type = "dl"
-    else:
-        internal_doc_type = norm_doc_type
-
-    # 4. Upload Content Validation
     try:
         content = image.file.read()
     except Exception as e:
@@ -282,7 +228,6 @@ def verify_document(
     if validation_error:
         return validation_error
 
-    # 5. Save to Temporary File & Execute Pipeline
     ext = os.path.splitext(image.filename)[1].lower() if image.filename else ".jpg"
     if ext not in ALLOWED_EXTENSIONS:
         ext = ".jpg"
@@ -294,33 +239,18 @@ def verify_document(
         temp_file.write(content)
         temp_file.close()
 
-        logger.info(f"Processing verification request for doc_type='{norm_doc_type}'")
+        logger.info(f"Processing verification request for filename='{image.filename}', doc_type='{norm_doc_type}'")
 
-        # Execute blocking pipeline inference (runs in FastAPI threadpool)
         raw_result = pipeline.predict_document_authenticity(
             img_path=temp_path,
-            doc_type=internal_doc_type,
+            doc_type=norm_doc_type,
             doc_number=doc_number,
             mrz_line1=mrz_line1,
-            mrz_line2=mrz_line2
+            mrz_line2=mrz_line2,
+            original_filename=image.filename or "uploaded_image.jpg"
         )
 
-        # Normalize internal doc_type in output ("aadhar" -> "aadhaar")
-        res_doc_type = raw_result.get("doc_type", norm_doc_type)
-        if res_doc_type == "aadhar":
-            res_doc_type = "aadhaar"
-
-        response_payload = {
-            "success": True,
-            "filename": image.filename or "uploaded_image.jpg",
-            "doc_type": res_doc_type,
-            "verdict": raw_result.get("verdict", "INSUFFICIENT_IMAGE_QUALITY"),
-            "risk_score": raw_result.get("risk_score", 0.0),
-            "reasons": raw_result.get("reasons", []),
-            "evidence_table": raw_result.get("evidence_table", {})
-        }
-
-        return response_payload
+        return raw_result
 
     except Exception as e:
         logger.error(f"Error during document prediction: {str(e)}", exc_info=True)
@@ -329,7 +259,6 @@ def verify_document(
             content={"success": False, "error": {"code": "PIPELINE_ERROR", "message": "An error occurred while running prediction pipeline"}}
         )
     finally:
-        # Mandatory temporary file deletion
         if os.path.exists(temp_path):
             try:
                 os.remove(temp_path)
